@@ -1,0 +1,52 @@
+[
+  {
+    "version": "v5.0-rc1-gold",
+    "date": "2023-06-30",
+    "changes": [
+      {
+        "type": "feature",
+        "component": "HCTColor",
+        "description": "Implemented cross-platform color tokens with WCAG AA compliance for dark mode",
+        "files": ["HCTColor.swift", "Color.kt", "Theme.kt"]
+      },
+      {
+        "type": "feature",
+        "component": "AR Tools",
+        "description": "Added bubble-level/inclinometer functionality to iOS measurement tools",
+        "files": ["ARMeasuringScreen.swift"]
+      },
+      {
+        "type": "feature",
+        "component": "Android Modules",
+        "description": "Configured ARCoreMeasure in settings.gradle.kts and established module structure",
+        "files": ["settings.gradle.kts", "third_party/arcoremeasure/build.gradle.kts"]
+      },
+      {
+        "type": "enhancement",
+        "component": "Version Control",
+        "description": "Enabled Git LFS for USDZ assets and other binary files",
+        "files": [".gitattributes"]
+      },
+      {
+        "type": "feature",
+        "component": "RoomPlan Integration",
+        "description": "Integrated RoomPlan neutral fork via Swift Package Manager",
+        "files": ["Package.swift", "RoomScanKit.swift"]
+      },
+      {
+        "type": "feature",
+        "component": "SmartSnap Integration",
+        "description": "Added SmartSnap-iOS dependency for enhanced scan accuracy",
+        "files": ["Package.swift"]
+      },
+      {
+        "type": "enhancement",
+        "component": "CI/CD",
+        "description": "Finalized CI configuration for v5.0-rc1-gold release",
+        "files": ["ios-build.yml", "android-build.yml", "smoke.yml"]
+      }
+    ],
+    "contributors": ["development-team", "design-team", "qa-team"],
+    "releaseNotes": "This gold release candidate finalizes the cross-platform color token system, adds bubble-level functionality, integrates RoomPlan and SmartSnap modules, and ensures proper CI/CD pipeline configuration with automated testing."
+  }
+]

@@ -1,0 +1,151 @@
+name: Snapshot Testing and Artifact Uploads
+
+on:
+  workflow_dispatch: # Allows manual triggering
+  pull_request:
+    branches:
+      - main
+      - develop
+      - 'release/**'
+  push:
+    branches:
+      - main
+      - develop
+      - 'v*.*-rc*-gold'
+
+jobs:
+  ios_snapshot_tests:
+    name: iOS Snapshot Tests
+    runs-on: macos-latest
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_15.0.app/Contents/Developer
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          lfs: true # Ensure LFS objects are fetched
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s $DEVELOPER_DIR
+
+      - name: Setup Ruby for Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: true
+
+      - name: Install Fastlane
+        run: gem install fastlane
+
+      - name: Run iOS Snapshot Tests
+        working-directory: ./ios
+        run: |
+          fastlane snapshot_test
+        env:
+          SNAPSHOT_ARTIFACTS_PATH: ./fastlane/screenshots
+
+      - name: Archive Snapshot Test Results
+        if: always() # Run even if tests fail
+        working-directory: ./ios
+        run: |
+          mkdir -p snapshot_artifacts
+          cp -R fastlane/screenshots/* snapshot_artifacts/ || echo "No screenshots generated"
+          cp -R fastlane/test_output/* snapshot_artifacts/ || echo "No test output available"
+
+      - name: Upload Snapshot Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-snapshot-results
+          path: ios/snapshot_artifacts
+          retention-days: 14
+
+  android_snapshot_tests:
+    name: Android Snapshot Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          lfs: true # Ensure LFS objects are fetched
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        working-directory: ./android
+        run: chmod +x gradlew
+
+      - name: Run Compose Screenshot Tests
+        working-directory: ./android
+        run: ./gradlew executeComposeScreenshotTests
+
+      - name: Collect Snapshot Results
+        if: always() # Run even if tests fail
+        working-directory: ./android
+        run: |
+          mkdir -p snapshot_artifacts
+          cp -R app/build/outputs/compose_screenshot_test/* snapshot_artifacts/ || echo "No screenshots generated"
+          cp -R app/build/reports/compose_screenshot_test/* snapshot_artifacts/ || echo "No reports available"
+
+      - name: Upload Android Snapshot Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-snapshot-results
+          path: android/snapshot_artifacts
+          retention-days: 14
+
+  publish_snapshot_baseline:
+    name: Publish Snapshot Baseline
+    needs: [ios_snapshot_tests, android_snapshot_tests]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/v') && endsWith(github.ref, '-gold'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+
+      - name: Download iOS Snapshot Results
+        uses: actions/download-artifact@v3
+        with:
+          name: ios-snapshot-results
+          path: downloaded/ios
+
+      - name: Download Android Snapshot Results
+        uses: actions/download-artifact@v3
+        with:
+          name: android-snapshot-results
+          path: downloaded/android
+
+      - name: Commit Baseline Updates
+        run: |
+          git config --local user.email "ci@scaffoldpro.com"
+          git config --local user.name "ScaffoldPRO CI"
+          
+          # Copy baseline images to repository
+          mkdir -p snapshots/ios
+          mkdir -p snapshots/android
+          cp -r downloaded/ios/* snapshots/ios/ || true
+          cp -r downloaded/android/* snapshots/android/ || true
+          
+          git add snapshots
+          git commit -m "ci: update snapshot baselines [skip ci]"
+          git push

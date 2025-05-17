@@ -1,0 +1,50 @@
+# ScaffoldPRO v5.0 (Gold-Pass)
+
+*May 16, 2025*
+
+## Overview
+
+We are proud to announce the official release of ScaffoldPRO v5.0, representing a significant milestone in our professional-grade application for construction professionals. This release includes our headlining Field Tools feature set, enhanced measurement capabilities, improved color systems, and robust CI/CD pipeline configurations.
+
+## What's New
+
+### ✨ New Features
+
+- **Field Tools**: Complete suite of on-site measurement and analysis tools
+  - **AR Tape Measure**: Complete measurement capabilities for iOS and Android
+  - **Bubble-Level/Inclinometer**: Integrated level tools for precise alignment
+  - **Room Scanning**: LiDAR-based room scanning for iOS devices
+- **WCAG AA Compliance**: Enhanced color token system across platforms
+
+### 🔧 Improvements
+
+- Updated GitHub Actions workflows with improved configurations
+- Added snapshot CI job for automated visual regression testing
+- Enabled Git LFS tracking for large binary files
+- Added required iOS permissions for camera and photo library access
+
+### 🐛 Bug Fixes
+
+- Fixed AR measurement accuracy issues on certain Android devices
+- Resolved UI layout issues on smaller iOS devices
+- Fixed color contrast issues for better accessibility
+- Improved error handling for Room Scanning feature
+
+## Known Issues
+
+- Room Scanning feature requires iOS 16+ and a device with LiDAR sensor
+- Some AR features may have reduced accuracy in low-light conditions
+
+## Installation
+
+The application is available for download from:
+- iOS: App Store (pending review)
+- Android: Google Play Store (pending review)
+
+## Documentation
+
+For detailed documentation, please visit our [developer portal](https://example.com/scaffold-pro-docs).
+
+---
+
+*ScaffoldPRO v5.0 Gold-Pass achieved. All checks are green. It's now safe to proceed with App Store/Play Store submissions.*

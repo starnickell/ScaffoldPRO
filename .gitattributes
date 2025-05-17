@@ -1,0 +1,27 @@
+# Git LFS configuration for 3D assets and large binary files
+
+# USDZ 3D models for AR experiences
+*.usdz filter=lfs diff=lfs merge=lfs -text
+
+# Other common 3D and asset formats
+*.obj filter=lfs diff=lfs merge=lfs -text
+*.fbx filter=lfs diff=lfs merge=lfs -text
+*.scn filter=lfs diff=lfs merge=lfs -text
+*.dae filter=lfs diff=lfs merge=lfs -text
+
+# Large images/textures
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.tif filter=lfs diff=lfs merge=lfs -text
+*.tiff filter=lfs diff=lfs merge=lfs -text
+*.psd filter=lfs diff=lfs merge=lfs -text
+
+# Other binary files
+*.pdf filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text
+*.aar filter=lfs diff=lfs merge=lfs -text
+
+# Test snapshot baselines
+**/snapshots/**/*.png filter=lfs diff=lfs merge=lfs -text
+**/__snapshots__/**/*.png filter=lfs diff=lfs merge=lfs -text

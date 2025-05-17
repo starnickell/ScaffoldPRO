@@ -1,0 +1,151 @@
+name: E2E Smoke Tests
+
+on:
+  workflow_dispatch: # Allows manual triggering
+  pull_request:
+    branches:
+      - main
+      - develop
+      - 'rc-*'
+  push:
+    branches:
+      - main
+      - develop
+      - 'rc-*'
+
+jobs:
+  ios_smoke_test:
+    name: iOS Detox Smoke Test
+    needs: [ios-build] # This implies ios-build is a job in another workflow or this one if defined
+    runs-on: macos-13
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_15.3.app/Contents/Developer
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Select Xcode version (macos-13 specific)
+        run: |
+          echo "Available Xcode versions:"
+          ls /Applications | grep Xcode || echo "No Xcode installations found via ls /Applications"
+          echo "Attempting to select Xcode 15.3: $DEVELOPER_DIR"
+          if [ -d "$DEVELOPER_DIR" ]; then
+            sudo xcode-select -s "$DEVELOPER_DIR"
+            echo "Selected Xcode version:"
+            xcodebuild -version
+          else
+            echo "Xcode 15.3 not found at $DEVELOPER_DIR. Using default Xcode for macos-13."
+            echo "Current Xcode version:"
+            xcodebuild -version
+            echo "Please ensure Xcode 15.3 is available at the specified path or update DEVELOPER_DIR."
+            # Attempt to use the default Xcode 15.3 path for macos-13 image if custom path fails
+            if [ -d "/Applications/Xcode_15.3.app/Contents/Developer" ]; then 
+                echo "Falling back to default Xcode 15.3 path for macos-13 image"
+                sudo xcode-select -s "/Applications/Xcode_15.3.app/Contents/Developer"
+                xcodebuild -version
+            else
+                echo "Default Xcode 15.3 path also not found. Exiting."
+                exit 1
+            fi
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Or your project's Node version
+
+      - name: Install Detox CLI
+        run: npm install -g detox-cli
+
+      - name: Install project dependencies (iOS)
+        working-directory: ./ios # Assuming package.json is here for Detox setup
+        run: npm install # Or yarn install
+
+      # This step assumes you have a pre-built app from the ios-build job
+      # You might need to download it as an artifact if ios-build is in a separate workflow_call
+      # For simplicity, assuming ios-build job in *this* workflow or app is available
+      # If ios-build is a separate workflow, you'd use actions/download-artifact here
+      # - name: Download iOS App Artifact
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: scaffoldpro-ios-ipa # Or the name of your app artifact
+      #     path: ./ios/build/ # Adjust path as needed
+
+      - name: Build Detox for iOS (if not pre-built with app)
+        working-directory: ./ios
+        run: detox build -c ios.sim.release
+
+      - name: Run Detox tests for iOS
+        working-directory: ./ios
+        run: detox test -c ios.sim.release --cleanup
+        env:
+          DETOX_IOS_SCHEME: ${{ secrets.DETOX_IOS_SCHEME }} # Using the secret
+
+      - name: Upload Detox Test Artifacts (Logs, Screenshots)
+        if: always() # Upload artifacts even if tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: detox-ios-test-artifacts
+          path: |
+            ./ios/artifacts/
+            ./ios/detox.log
+          retention-days: 14
+          if-no-files-found: error # Changed to error as per new reqs, though some might be warn
+
+  android_smoke_test:
+    name: Android Maestro Smoke Test
+    needs: [android-build] # This implies android-build is a job in another workflow or this one
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Maestro
+        run: curl -Ls "https://get.maestro.mobile.dev" | bash
+
+      # This step assumes you have a pre-built AAB/APK from the android-build job
+      # You might need to download it as an artifact if android-build is in a separate workflow_call
+      # - name: Download Android App Artifact
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: scaffoldpro-android-aab # Or the name of your app artifact
+      #     path: ./android/app/build/outputs/bundle/release/
+
+      - name: Run Maestro Cloud tests
+        # Assuming flows are in a 'flows' directory at the root
+        # And that the app is available or Maestro Cloud handles app upload via apiKey
+        run: ~/.maestro/bin/maestro cloud --apiKey ${{ secrets.MAESTRO_KEY }} flows/login.yaml
+        # If app needs to be specified and is downloaded:
+        # run: ~/.maestro/bin/maestro cloud --apiKey ${{ secrets.MAESTRO_KEY }} --app-file ./android/app/build/outputs/bundle/release/app-release.aab flows/login.yaml
+
+      - name: Upload Maestro Test Artifacts (Report, Logs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-android-test-artifacts
+          # Adjust path based on where Maestro Cloud outputs reports/logs locally, if at all
+          # Or if Maestro Cloud provides a link, this step might be different (e.g., save link to a file)
+          path: |
+            ./maestro-report.html
+            ./maestro.log
+          retention-days: 14
+          if-no-files-found: error # Changed to error, might need to be 'warn' if files are conditional
+
+# Note: The 'needs' field for ios_smoke_test and android_smoke_test currently points to jobs
+# named 'ios-build' and 'android-build'. If these are jobs within *other* workflows
+# (e.g., ios-build.yml, android-build.yml), this smoke.yml workflow needs to be triggered
+# by `workflow_run` or the build workflows need to call this smoke workflow using `workflow_call`.
+# For simplicity and direct dependency, the user's spec `needs: [ios-build, android-build]`
+# implies these might be job IDs. If they are workflow *filenames*, the triggering mechanism
+# needs adjustment. I will assume for now they are job IDs that will be resolved by GitHub Actions.
+# The user also specified `kb-ingest.yml` & `graphql-build.yml` must finish green.
+# This implies the overall CI check will include those workflows separately, not as direct `needs` here.
+

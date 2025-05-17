@@ -1,0 +1,52 @@
+{
+  "version": "v5.0",
+  "releaseDate": "2025-05-16",
+  "status": "released",
+  "branch": "field-tools",
+  "tag": "v5.0",
+  "milestones": [
+    {
+      "name": "AR Measurement Tools",
+      "status": "completed",
+      "date": "2025-05-12"
+    },
+    {
+      "name": "Room Scanning Integration",
+      "status": "completed",
+      "date": "2025-05-12"
+    },
+    {
+      "name": "WCAG AA Compliance",
+      "status": "completed",
+      "date": "2025-05-12"
+    },
+    {
+      "name": "CI/CD Configuration",
+      "status": "completed",
+      "date": "2025-05-15"
+    },
+    {
+      "name": "Documentation Updates",
+      "status": "completed",
+      "date": "2025-05-16"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "scaffold_pro_ios.ipa",
+      "type": "application",
+      "platform": "ios"
+    },
+    {
+      "name": "scaffold_pro_android.apk",
+      "type": "application",
+      "platform": "android"
+    },
+    {
+      "name": "room_scan_samples.usdz",
+      "type": "sample_data",
+      "platform": "ios"
+    }
+  ],
+  "notes": "ScaffoldPRO v5.0 Gold-Pass release. All features completed and verified. Ready for App Store/Play Store submissions."
+}

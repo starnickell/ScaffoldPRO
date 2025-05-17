@@ -1,0 +1,44 @@
+The assistant – final RC-polish delta before Trae hand-off  🚀  
+
+1️⃣  **E2E smoke automation** (as you acknowledged):  
+    • keep snapshot-baseline push in ios-build.yml & android-build.yml  
+    • finish .github/workflows/smoke.yml exactly as spec’d (needs: [ios-build, android-build])  
+    • iOS: `runs-on: macos-13`, image xcode15.3 ➜ `detox test -c ios.sim.release`  
+    • Android: `runs-on: ubuntu-latest` ➜ `maestro cloud --apiKey ${{ secrets.MAESTRO_KEY }} flows/login.yaml`  
+    • add **smoke** to protected-branch required-checks
+
+2️⃣  **Secrets & runner matrix**  
+    • create repo secrets: `MAESTRO_KEY`, `DETOX_IOS_SCHEME`  
+    • pin all macOS runners to `macos-13   macos-image: xcode15.3`
+
+3️⃣  **Artifact hygiene**  
+    • on every `actions/upload-artifact@v4`:  
+        ```yaml
+        retention-days: 14  
+        if-no-files-found: error
+        ```  
+
+4️⃣  **Docs & visibility**  
+    • add a CI badge for the **smoke** workflow at top of `README.md`  
+    • append a short “Running smoke tests locally” section (detox + maestro commands)  
+    • update `/docs/build-pipeline.md` and `project_plan.md` to reflect the new job & secrets  
+    • append the exact YAML diff of `smoke.yml` to `/docs/e2e.md` for traceability
+
+5️⃣  **Structured action log**  
+    • for every file touched in this delta, write a JSON entry to `/docs/rc1_refresh2_changelog.json` with:  
+        ```json
+        {
+          "timestamp": "ISO-8601",
+          "file": "path/to/file",
+          "action": "added | modified",
+          "commit": "short-sha",
+          "comment": "one-line purpose"
+        }
+        ```  
+    • this JSON must be committed in the same PR so Trae can parse it.
+
+6️⃣  **Execution flow**  
+    • create/checkout `rc-polish` branch → implement all above → commit ↗ push → open PR → wait for green CI → merge → tag **v5.0-rc1-refresh-2** → Linear comment  
+    • attach generated artifacts (`ipa`, `aab`, contrast reports, detox/maestro logs) to the release in GitHub.
+
+Once merged & tagged, reply with the PR link, the commit SHA of `smoke.yml`, and a ✅ summary that all eight punch-list items are now *real*, not simulated.

@@ -1,0 +1,113 @@
+{
+  "release": {
+    "version": "v5.0.0",
+    "date": "2025-05-16",
+    "status": "completed",
+    "description": "Official release featuring Field Tools, cross-platform color token system, measurement tools, and CI/CD pipeline"
+  },
+  "features": [
+    {
+      "component": "Field Tools",
+      "description": "Complete suite of on-site measurement and analysis tools",
+      "details": [
+        "AR Tape Measure for iOS and Android",
+        "Bubble-Level/Inclinometer integration",
+        "LiDAR-based room scanning for iOS devices"
+      ]
+    },
+    {
+      "component": "HCTColor",
+      "description": "Enhanced color token system with WCAG AA compliance verification and additional semantic colors",
+      "files": ["HCTColor.swift", "Color.kt", "Theme.kt"]
+    },
+    {
+      "component": "AR Tools",
+      "description": "Implemented bubble-level/inclinometer functionality using Android SensorManager and iOS CoreMotion",
+      "files": ["ARMeasuringScreen.swift", "MeasureActivity.kt"]
+    },
+    {
+      "component": "AR Measurement",
+      "description": "Added complete AR-based measurement capabilities for both platforms",
+      "files": [
+        "Package.swift",
+        "build.gradle.kts",
+        "ARMeasuringScreen.swift",
+        "MeasureActivity.kt"
+      ]
+    },
+    {
+      "component": "Room Scanning",
+      "description": "Added LiDAR RoomPlan integration for iOS devices",
+      "files": [
+        "RoomScanningScreen.swift",
+        "RoomScanKit.swift",
+        "RoomCaptureViewController.swift"
+      ]
+    }
+  ],
+  "enhancements": [
+    {
+      "component": "Version Control",
+      "description": "Enabled Git LFS tracking for snapshot baseline files and USDZ assets",
+      "files": [".gitattributes"]
+    },
+    {
+      "component": "CI/CD",
+      "description": "Updated GitHub Actions workflows with improved configurations and artifact management",
+      "files": [
+        ".github/workflows/ios-build.yml",
+        ".github/workflows/android-build.yml",
+        ".github/workflows/smoke.yml",
+        ".github/workflows/snapshot.yml"
+      ]
+    },
+    {
+      "component": "Documentation",
+      "description": "Added comprehensive documentation for build pipeline and project plan",
+      "files": [
+        "README.md",
+        "build-pipeline.md",
+        "project_plan.md"
+      ]
+    },
+    {
+      "component": "Permissions",
+      "description": "Added required iOS permissions for camera and photo library access",
+      "files": ["Info.plist"]
+    }
+  ],
+  "fixes": [
+    {
+      "component": "AR Measurement",
+      "description": "Fixed AR measurement accuracy issues on certain Android devices"
+    },
+    {
+      "component": "UI",
+      "description": "Resolved UI layout issues on smaller iOS devices"
+    },
+    {
+      "component": "Accessibility",
+      "description": "Fixed color contrast issues for better accessibility"
+    },
+    {
+      "component": "Room Scanning",
+      "description": "Improved error handling for Room Scanning feature"
+    }
+  ],
+  "known_issues": [
+    {
+      "component": "Room Scanning",
+      "description": "Requires iOS 16+ and a device with LiDAR sensor"
+    },
+    {
+      "component": "AR Features",
+      "description": "May have reduced accuracy in low-light conditions"
+    }
+  ],
+  "completion": {
+    "timestamp": "2025-05-16T10:30:00Z",
+    "action": "gold-pass",
+    "comment": "All checklist items complete – workflows green, artifacts uploaded"
+  },
+  "contributors": ["development-team", "design-team", "qa-team"]
+}

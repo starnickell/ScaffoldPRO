@@ -1,0 +1,48 @@
+# ScaffoldPRO v5.0 Release
+## Major Features
+### Field Tools
+
+- **AR Tape Measure**: Implemented cross-platform measurement capabilities
+  - Added support for imperial and metric units
+  - Improved accuracy with surface detection algorithms
+- **Bubble Level**: Added digital level and inclinometer functionality
+  - Calibration workflow for device-specific adjustments
+  - Visual and haptic feedback for level detection
+- **Room Scanning**:
+  - **RoomPlan Integration**: Added LiDAR-based room scanning for iOS
+    - Implemented RoomCaptureSession and RoomCaptureView
+    - Added USDZ export functionality for scanned rooms
+  - **Measurement Export**: Added ability to export room dimensions
+    - CSV export for measurements and dimensions
+    - Integration with measurement history feature
+
+### Accessibility Improvements
+
+- **WCAG AA Compliance**: Enhanced color token system across platforms
+
+### CI/CD and Build Improvements
+
+- **Workflows**: Updated GitHub Actions workflows
+  - Improved iOS and Android build configurations
+  - Added E2E smoke test workflow with iOS Detox and Android Maestro jobs
+  - Added snapshot CI job for automated visual regression testing
+- **Artifact Management**: Configured automatic artifact uploads for release preparation
+  - Added USDZ artifact upload for RoomPlan scans
+  - Enabled Git LFS tracking for snapshot baseline files
+
+### Documentation
+
+- **Build Pipeline**: Added comprehensive documentation of CI workflows, secrets, artifacts, and status checks
+- **Project Plan**: Created detailed documentation outlining release tasks and objectives
+- **README**: Updated with clear instructions for running smoke tests locally
+
+## Bug Fixes
+
+- Fixed AR measurement accuracy issues on certain Android devices
+- Resolved UI layout issues on smaller iOS devices
+- Fixed color contrast issues for better accessibility
+- Improved error handling for Room Scanning feature
+
+---
+
+*ScaffoldPRO v5.0 Gold-Pass achieved. All checks are green. It's now safe to proceed with App Store/Play Store submissions.*

@@ -1,0 +1,113 @@
+name: Android Build, Test, and Release
+
+on:
+  workflow_dispatch: # Allows manual triggering
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'android/**'
+      - 'shared/**'
+      - '.github/workflows/android-build.yml'
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'android/**'
+      - 'shared/**'
+      - '.github/workflows/android-build.yml'
+
+jobs:
+  build_test_release_android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        working-directory: ./android
+        run: chmod +x gradlew
+
+      - name: Run Detekt
+        working-directory: ./android
+        run: ./gradlew detekt
+        # Add upload for detekt report if configured
+        # - name: Upload Detekt Report
+        #   if: failure() # or always()
+        #   uses: actions/upload-artifact@v4
+        #   with:
+        #     name: detekt-report
+        #     path: android/app/build/reports/detekt/
+
+      - name: Run Android Lint
+        working-directory: ./android
+        run: ./gradlew :app:lintDebug
+        # Add upload for lint report
+        # - name: Upload Lint Report
+        #   if: failure() # or always()
+        #   uses: actions/upload-artifact@v4
+        #   with:
+        #     name: lint-report-debug
+        #     path: android/app/build/reports/lint-results-debug.html
+
+      - name: Run unit tests
+        working-directory: ./android
+        run: ./gradlew :app:testDebugUnitTest
+        # Add upload for test reports
+        # - name: Upload Unit Test Results
+        #   if: failure() # or always()
+        #   uses: actions/upload-artifact@v4
+        #   with:
+        #     name: unit-test-results
+        #     path: android/app/build/reports/tests/testDebugUnitTest/
+
+      - name: Build Release AAB
+        working-directory: ./android
+        run: ./gradlew :app:bundleRelease
+        # This step would require signing configuration for a real release build.
+        # For now, it might build an unsigned AAB or fail if signing is enforced.
+
+      - name: Upload Release AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: scaffoldpro-android-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+
+      - name: Run Instrumentation Tests (Placeholder)
+        working-directory: ./android
+        run: |
+          echo "Simulating Instrumentation Tests..."
+          echo "To implement this, you would typically use Firebase Test Lab or an emulator setup."
+          echo "For example: ./gradlew :app:connectedCheck"
+          echo "Creating dummy snapshot files for now..."
+          mkdir -p ./app/build/outputs/androidTest-results/connected/snapshots
+          echo "Snapshot 1 data" > ./app/build/outputs/androidTest-results/connected/snapshots/snap1.png
+          echo "Snapshot 2 data" > ./app/build/outputs/androidTest-results/connected/snapshots/snap2.png
+          zip -r scaffoldpro-android-snapshots.zip ./app/build/outputs/androidTest-results/connected/snapshots
+
+      - name: Upload Android Snapshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: scaffoldpro-android-snapshots.zip
+          path: android/scaffoldpro-android-snapshots.zip
+

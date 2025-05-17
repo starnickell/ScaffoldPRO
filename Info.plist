@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleShortVersionString</key>
+    <string>5.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>2</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Needed for voice commands.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Needed for voice commands.</string>
+    <key>NSSpatialTrackingUsageDescription</key>
+    <string>Enables AR features and precise spatial awareness for accurate scaffold modeling and hazard identification.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Required for room scanning, measuring, and AR features.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Allows saving room scans and measurements to your photo library.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Allows saving scaffold models and measurement results.</string>
+    <!-- Other keys like CFBundleIdentifier, etc., would normally be here -->
+    <!-- For this task, only adding the specified permissions -->
+</dict>
+</plist>
+

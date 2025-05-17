@@ -1,0 +1,56 @@
+name: Create GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Download iOS Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ScaffoldPRO.ipa
+          path: ./artifacts
+
+      - name: Download Android Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ScaffoldPRO.aab
+          path: ./artifacts
+
+      - name: Download USDZ Models
+        uses: actions/download-artifact@v4
+        with:
+          name: usdz-models
+          path: ./artifacts/usdz
+          if-no-files-found: ignore
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./artifacts/ScaffoldPRO.ipa
+            ./artifacts/app-release.aab
+            ./artifacts/usdz/*
+          name: ScaffoldPRO ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body_path: RELEASE_NOTES.md.v5.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

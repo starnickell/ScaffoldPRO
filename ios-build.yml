@@ -1,0 +1,112 @@
+name: iOS Build and Test
+
+on:
+  workflow_dispatch: # Allows manual triggering
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'ios/**'
+      - 'shared/**'
+      - '.github/workflows/ios-build.yml'
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'ios/**'
+      - 'shared/**'
+      - '.github/workflows/ios-build.yml'
+
+jobs:
+  build_and_test_ios:
+    runs-on: macos-latest # Or your preferred macOS runner
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_15.0.app/Contents/Developer # Adjust Xcode version as needed
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'recursive' # If you use submodules like scaffold_project
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s $DEVELOPER_DIR
+
+      - name: Cache Swift Package Manager dependencies
+        uses: actions/cache@v3
+        with:
+          path: ios/.build # Path to SPM build artifacts
+          key: ${{ runner.os }}-spm-${{ hashFiles('ios/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: Resolve Swift Packages
+        working-directory: ./ios
+        run: xcodebuild -resolvePackageDependencies -scheme ScaffoldPRO -project ScaffoldPRO.xcodeproj # Adjust project/scheme name
+
+      - name: Build iOS Application
+        working-directory: ./ios
+        run: |
+          xcodebuild build -scheme ScaffoldPRO \
+            -project ScaffoldPRO.xcodeproj \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO
+          # Adjust scheme, project, and destination as needed
+
+      - name: Run iOS Tests
+        working-directory: ./ios
+        run: |
+          xcodebuild test -scheme ScaffoldPRO \
+            -project ScaffoldPRO.xcodeproj \
+            -destination 'platform=iOS Simulator,name=iPhone 15 Pro Max,OS=latest' \
+            CODE_SIGNING_ALLOWED=NO
+          # Adjust scheme, project, and destination as needed
+
+      - name: Run ContrastKit Audit (Placeholder)
+        working-directory: ./ios
+        run: |
+          echo "Simulating ContrastKit Audit..."
+          echo "To integrate ContrastKit, you would typically:"
+          echo "1. Add ContrastKit as a dependency to your test target."
+          echo "2. Write XCUITests that use ContrastKit to check views/screens."
+          echo "3. Ensure these tests are run as part of this workflow."
+          echo "Creating a dummy HTML report file for now..."
+          echo "<html><body><h1>ContrastKit Audit Report (Simulated)</h1><p>- Screen A: OK</p><p>- Screen B: WARNING - Low contrast on button X</p></body></html>" > scaffoldpro-contrast-report.html
+
+      - name: Upload ContrastKit Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: scaffoldpro-contrast-report.html
+          path: ./ios/scaffoldpro-contrast-report.html
+
+      - name: Archive iOS Build Artifact (Example)
+        if: success() # Or always(), depending on needs
+        working-directory: ./ios
+        run: |
+          mkdir -p build/archive
+          xcodebuild archive -project ScaffoldPRO.xcodeproj \
+            -scheme ScaffoldPRO \
+            -archivePath build/archive/ScaffoldPRO.xcarchive \
+            SKIP_INSTALL=NO \
+            CODE_SIGNING_ALLOWED=NO
+          # Create a dummy artifact for now
+          echo "Dummy archive content" > build/archive/ScaffoldPRO.xcarchive/dummy.txt
+          # Placeholder for IPA creation - in a real scenario, this would involve xcodebuild -exportArchive
+          echo "Dummy IPA content" > build/archive/ScaffoldPRO.ipa
+
+      - name: Upload iOS Build Artifact (XCArchive)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scaffoldpro-ios-xcarchive # Ensure artifact name follows convention
+          path: ./ios/build/archive/ScaffoldPRO.xcarchive
+
+      - name: Upload iOS Build Artifact (IPA Placeholder)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scaffoldpro-ios-ipa # Ensure artifact name follows convention
+          path: ./ios/build/archive/ScaffoldPRO.ipa
+

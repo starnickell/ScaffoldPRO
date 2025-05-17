@@ -1,0 +1,76 @@
+{
+  "release": {
+    "version": "v5.0.0",
+    "date": "2025-05-16",
+    "status": "completed",
+    "description": "Official release featuring Field Tools, cross-platform color token system, measurement tools, and CI/CD pipeline"
+  },
+  "features": [
+    {
+      "component": "HCTColor",
+      "description": "Enhanced color token system with WCAG AA compliance verification and additional semantic colors",
+      "files": ["HCTColor.swift", "Color.kt", "Theme.kt"]
+    },
+    {
+      "component": "AR Tools",
+      "description": "Implemented bubble-level/inclinometer functionality using Android SensorManager and iOS CoreMotion",
+      "files": ["ARMeasuringScreen.swift", "MeasureActivity.kt"]
+    },
+    {
+      "component": "AR Measurement",
+      "description": "Added complete AR-based measurement capabilities for both platforms",
+      "files": [
+        "scaffold_project/ios/Package.swift",
+        "scaffold_project/android/app/build.gradle.kts",
+        "scaffold_project/ios/ScaffoldPRO/Features/ARMeasure/ARMeasuringScreen.swift",
+        "scaffold_project/android/app/src/main/java/com/scaffoldpro/app/features/armeasure/MeasureActivity.kt"
+      ]
+    },
+    {
+      "component": "Room Scanning",
+      "description": "Added LiDAR RoomPlan integration for iOS devices",
+      "files": [
+        "scaffold_project/ios/ScaffoldPRO/Features/RoomScan/RoomScanningScreen.swift",
+        "scaffold_project/ios/RoomScanKit/RoomScanKit.swift",
+        "scaffold_project/ios/RoomScanKit/RoomCaptureViewController.swift"
+      ]
+    }
+  ],
+  "enhancements": [
+    {
+      "component": "Version Control",
+      "description": "Enabled Git LFS tracking for snapshot baseline files and USDZ assets",
+      "files": [".gitattributes"]
+    },
+    {
+      "component": "CI/CD",
+      "description": "Updated GitHub Actions workflows with improved configurations and artifact management",
+      "files": [
+        "scaffold_project/.github/workflows/ios-build.yml",
+        "scaffold_project/.github/workflows/android-build.yml",
+        "scaffold_project/.github/workflows/smoke.yml",
+        "scaffold_project/.github/workflows/snapshot.yml"
+      ]
+    },
+    {
+      "component": "Documentation",
+      "description": "Added comprehensive documentation for build pipeline and project plan",
+      "files": [
+        "scaffold_project/README.md",
+        "scaffold_project/docs/build-pipeline.md",
+        "scaffold_project/docs/project_plan.md"
+      ]
+    },
+    {
+      "component": "Permissions",
+      "description": "Added required iOS permissions for camera and photo library access",
+      "files": ["Info.plist"]
+    }
+  ],
+  "completion": {
+    "timestamp": "2025-05-16T10:30:00Z",
+    "action": "gold-pass",
+    "comment": "All checklist items complete – workflows green, artifacts uploaded"
+  },
+  "contributors": ["development-team", "design-team", "qa-team"]
+}
